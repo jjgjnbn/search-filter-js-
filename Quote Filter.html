@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quote Filter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    #search {
+      width: 300px;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      margin-bottom: 5px;
+    }
+
+    #errorMessage {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Quote Filter</h1>
+  
+  <label for="search">Search:</label>
+  <input type="text" id="search" placeholder="Enter a search term">
+  
+  <ul id="quoteList"></ul>
+
+  <div id="errorMessage" style="color: red; display: none;">Error fetching quotes. Please try again later.</div>
+
+  <script>
+    const quoteList = document.getElementById('quoteList');
+    const searchInput = document.getElementById('search');
+    const errorMessage = document.getElementById('errorMessage');
+
+
+    function fetchQuotes() {
+  fetch('https://dummyjson.com/quotes')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Error fetching quotes. Please try again later.');
+      }
+      return response.json();
+    })
+    .then(quotes => {
+      displayQuotes(quotes);
+    })
+    .catch(error => {
+      console.error(error);
+      errorMessage.style.display = 'block';
+    });
+}
+
+    function displayQuotes(quotes) {
+      quoteList.innerHTML = ''; 
+
+      quotes.forEach(quote => {
+        const listItem = document.createElement('li');
+        listItem.textContent = quote.text;
+        quoteList.appendChild(listItem);
+      });
+    }
+
+
+    function filterQuotes() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const quotes = Array.from(quoteList.getElementsByTagName('li'));
+
+      quotes.forEach(quote => {
+        const text = quote.textContent.toLowerCase();
+        if (text.includes(searchTerm)) {
+          quote.style.display = 'block';
+        } else {
+          quote.style.display = 'none';
+        }
+      });
+    }
+
+
+    searchInput.addEventListener('input', filterQuotes);
+
+    fetchQuotes();
+  </script>
+</body>
+</html>
